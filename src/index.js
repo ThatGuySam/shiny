@@ -335,27 +335,35 @@ if (isSupported()) {
     }
 
     const init = () => {
-
+        
         // reset initial orientation when document is hidden/shown
         document.addEventListener('visibilitychange', e => {
             state.orientationInitial = null;
         });
+        
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
 
-        // register orientation changes
-        window.addEventListener('deviceorientation', e => {
-            if (e.alpha === null) return;
-            state.orientation.alpha = e.alpha;
-            state.orientation.beta = e.beta;
-            state.orientation.gamma = e.gamma;
-            if (state.orientationInitial === null) {
-                state.orientationInitial = {
-                    alpha: e.alpha,
-                    beta: e.beta,
-                    gamma: e.gamma
+                    // register orientation changes
+                    window.addEventListener('deviceorientation', e => {
+                        if (e.alpha === null) return;
+                        state.orientation.alpha = e.alpha;
+                        state.orientation.beta = e.beta;
+                        state.orientation.gamma = e.gamma;
+                        if (state.orientationInitial === null) {
+                            state.orientationInitial = {
+                                alpha: e.alpha,
+                                beta: e.beta,
+                                gamma: e.gamma
+                            }
+                            tick();
+                        }
+                    });
+                    
                 }
-                tick();
-            }
-        });
+            })
+            .catch(console.error);
 
     };
 
